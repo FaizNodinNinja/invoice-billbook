@@ -1,0 +1,6 @@
+body { font-size: 14px; color: #333; }
+        .invoice-box { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 6px; }
+        .company-logo { max-height: 70px; }
+        .table th { background: #f8f9fa; }
+        .totals-table td, .totals-table th { border: none !important; }
+        .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #777; }

@@ -1,0 +1,317 @@
+{% extends 'common/base.html'%}
+{% load static %}
+{% block main %}
+
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                ✅ Data added successfully!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="main-panel mt-2">
+    <div class="row mt-2">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Add Client Lead</h4>
+                        <a href="{% url 'lead-sheet' %}" class="btn btn-sm btn-outline-warning text-black">
+                            View
+                        </a>
+                    </div>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div class="mb-3">
+                                    {{ form.client_name.label_tag }}
+                                    {{ form.client_name }}
+                                    {% if form.client_name.errors %}
+                                    <div class="text-danger">{{ form.client_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.phone_no.label_tag }}
+                                    {{ form.phone_no }}
+                                    {% if form.phone_no.errors %}
+                                    <div class="text-danger">{{ form.phone_no.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.address.label_tag }}
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                    <div class="text-danger">{{ form.address.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.industry.label_tag }}
+
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.industry }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" id="reopenModal" data-bs-target="#industryModal">
+                                            Add
+                                        </button>
+
+                                    </div>
+
+                                    {% if form.industry.errors %}
+                                    <div class="text-danger">{{ form.industry.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="mb-3">
+                                    {{ form.industrytype.label_tag }}
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.industrytype }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" data-bs-target="#industrytypeModal">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    {% if form.industrytype.errors %}
+                                    <div class="text-danger">{{ form.industrytype.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.country.label_tag }}
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.country }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" data-bs-target="#countryModal">
+                                            Add
+                                        </button>
+                                    </div>
+                                    {% if form.country.errors %}
+                                    <div class="text-danger">{{ form.country.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.state.label_tag }}
+
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.state }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" data-bs-target="#stateModal">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    {% if form.state.errors %}
+                                    <div class="text-danger">{{ form.state.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.city.label_tag }}
+
+
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.city }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" data-bs-target="#cityModal">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    {% if form.city.errors %}
+                                    <div class="text-danger">{{ form.city.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form.clientstatus.label_tag }}
+                                    <div class="d-flex gap-2 align-items-center">
+                                        {{ form.clientstatus }}
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-bs-toggle="modal" data-bs-target="#clientstatusModal">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    {% if form.clientstatus.errors %}
+                                    <div class="text-danger">{{ form.clientstatus.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Submit</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- container-fluid -->
+
+
+<!-- Modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="industryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="industry-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Industry</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="industry-name" name="industry" class="form-control"
+                           placeholder="Enter Industry Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="industrytypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="industrytype-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Industry Type</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="industrytype-name" name="industrytype" class="form-control"
+                           placeholder="Enter Industry Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="countryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="country-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Country</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="country-name" name="country" class="form-control"
+                           placeholder="Enter Industry Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="stateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="state-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add State</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="state-name" name="state" class="form-control"
+                           placeholder="Enter Industry Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="cityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="city-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add City</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="city-name" name="city" class="form-control" placeholder="Enter City Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="clientstatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="clientstatus-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Client Ctatus</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="clientstatus-name" name="clientstatus" class="form-control"
+                           placeholder="Enter Industry Name">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- jQuery (required) -->
+
+
+<!-- Bootstrap Bundle (includes Popper) -->
+
+
+{% endblock %}

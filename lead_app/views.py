@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
 from .forms import LeadForm
 from .models import Lead
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import (Industry, IndustryType,Country, State, City, ClientStatus)
 import logging
@@ -18,10 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, 'index.html')
 
+@login_required(login_url='login')
 def dashboard(request):
-
     # 📊 Dashboard data
     total_customers = Client.objects.count()
     total_invoices = Invoice.objects.count()

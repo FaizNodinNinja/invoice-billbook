@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 6px;
+        }
+        .no-border td {
+            border: none;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        h4 {
+            margin: 10px 0 5px 0;
+        }
+        .totals-table {
+            width: 40%;
+            margin-left: auto;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+        img.logo {
+            max-width: 150px;
+        }
+        .highlight {
+            color: #007BFF; /* Example brand color */
+        }
+        .items-header {
+            background-color: #f9f9f9; /* light background */
+        }
+        .items-table td, .items-table th {
+            border: none; /* remove borders */
+        }
+        .amount-row td {
+            border: none; /* remove border for totals */
+            padding: 4px 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<table class="no-border">
+    <tr>
+        <td style="width:50%; vertical-align: top;">
+            {% if quotation.company.logo %}
+            <img src="{{ quotation.company.logo.url }}" style="max-width:50px;">
+            {% else %}
+            <h2 class="highlight">{{ quotation.company.name }}</h2>
+            {% endif %}
+        </td>
+        <td style="width:50%; vertical-align: top;" class="text-right">
+            <strong class="highlight">{{ quotation.company.name }}</strong><br>
+            {{ quotation.company.address }}<br>
+            Email: {{ quotation.company.email }} | Phone: {{ quotation.company.phone }}<br>
+            {% if quotation.company.gst_number %}
+            GST: {{ quotation.company.gst_number }}<br>
+            {% endif %}
+            Currency: {{ quotation.company.currency }}
+        </td>
+    </tr>
+</table>
+
+<!-- Client & Invoice Info -->
+<table class="no-border">
+    <tr>
+        <td style="width:50%; vertical-align: top;">
+            <h4>Bill To:</h4>
+            <strong class="highlight">{{ quotation.client.name }}</strong><br>
+            {% if quotation.client.company %}
+            {{ quotation.client.company }}<br>
+            {% endif %}
+            {{ quotation.client.address }}<br>
+            {{ quotation.client.email }} | {{ quotation.client.phone }}<br>
+            {{ quotation.client.country }}
+        </td>
+        <td style="width:50%; vertical-align: top;" class="text-right">
+            <h4>Invoice Details</h4>
+            <b>Invoice No:</b> {{ invoice.invoice_number }}<br>
+            <b>Date:</b> {{ invoice.date }}<br>
+            <b>Due Date:</b> {{ invoice.due_date }}<br>
+            <b>Status:</b> {{ invoice.get_status_display }}<br>
+            {% if quotation.quotation_number %}
+            <b>Quotation Ref:</b> {{ quotation.quotation_number }}
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<!-- Items Table -->
+<table class="items-table">
+    <thead class="items-header">
+    <tr>
+        <th class="text-center">Item & Description</th>
+        <th class="text-center">Qty</th>
+        <th class="text-right">Unit Price ({{ quotation.company.currency }})</th>
+        <th class="text-right">Total ({{ quotation.company.currency }})</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+        <td class="text-center">{{ item.description }}</td>
+        <td class="text-center">{{ item.quantity }}</td>
+        <td class="text-right">{{ item.unit_price|floatformat:2 }}</td>
+        <td class="text-right">{{ item.total|floatformat:2 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4" class="text-center">No items available</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- Totals -->
+<table class="totals-table">
+    <tr class="amount-row">
+        <td class="text-right"><strong>Subtotal:</strong></td>
+        <td class="text-right">{{ quotation.subtotal|floatformat:2 }}</td>
+    </tr>
+    <tr class="amount-row">
+        <td class="text-right"><strong>Tax:</strong></td>
+        <td class="text-right">{{ quotation.tax|floatformat:2 }}</td>
+    </tr>
+    <tr class="amount-row">
+        <td class="text-right"><strong>Total:</strong></td>
+        <td class="text-right"><strong>{{ quotation.total|floatformat:2 }}</strong></td>
+    </tr>
+</table>
+
+<!-- Terms & Notes -->
+{% if quotation.terms %}
+<h4>Terms & Conditions</h4>
+<p>{{ quotation.terms }}</p>
+{% endif %}
+{% if quotation.notes %}
+<h4>Additional Notes</h4>
+<p>{{ quotation.notes }}</p>
+{% endif %}
+
+<!-- Footer -->
+<div class="footer">
+    <p><strong>Thank you for your business!</strong></p>
+</div>
+
+
+</body>
+</html>

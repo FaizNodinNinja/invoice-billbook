@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mindtrix — Login</title>
+
+  <!-- Vendor CSS -->
+  <link rel="stylesheet" href="{% static 'vendors/feather/feather.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="shortcut icon" href="{% static 'images/favicon.png' %}"/>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Floating blobs for modern feel */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.5;
+        animation: float 8s ease-in-out infinite;
+    }
+    body::before {
+        width: 300px;
+        height: 300px;
+        background: #818cf8;
+        top: -100px;
+        left: -100px;
+        animation-delay: 2s;
+    }
+    body::after {
+        width: 400px;
+        height: 400px;
+        background: #c084fc;
+        bottom: -150px;
+        right: -100px;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .login-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .login-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 18px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        padding: 2.5rem 2rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.2);
+    }
+
+    .brand-logo img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .btn-login {
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 12px;
+        padding: 10px 0;
+        transition: all 0.3s ease;
+    }
+    .btn-login:hover {
+        background: linear-gradient(90deg, #4338ca, #7e22ce);
+        box-shadow: 0 0 20px rgba(99,102,241,0.5);
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        transition: 0.2s;
+    }
+    .form-control:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 5px rgba(99,102,241,0.3);
+    }
+
+    .text-gradient {
+        background: linear-gradient(90deg, #6366f1, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
+
+    a.text-primary:hover {
+        text-decoration: underline;
+    }
+
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-wrapper fade-in">
+      <div class="login-card text-center">
+          <div class="brand-logo mx-auto">
+              <img src="{% static 'images/logo.png' %}" alt="Mindtrix Logo">
+          </div>
+          <h3 class="text-gradient mb-1">Welcome Back 👋</h3>
+          <p class="text-muted mb-4">Sign in to your Mindtrix dashboard</p>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" novalidate>
+              {% csrf_token %}
+              <div class="mb-3 text-start">
+                  <label class="form-label fw-semibold">Username</label>
+                  <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="mdi mdi-account"></i></span>
+                      <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+                  </div>
+              </div>
+              <div class="mb-3 text-start">
+                  <label class="form-label fw-semibold">Password</label>
+                  <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="mdi mdi-lock-outline"></i></span>
+                      <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                  </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="remember">
+                      <label class="form-check-label small" for="remember">Remember me</label>
+                  </div>
+                  <a href="#" class="small text-primary">Forgot password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-login w-100">Login</button>
+          </form>
+
+          <div class="mt-4">
+              <p class="small text-muted mb-0">
+                Don’t have an account?
+                <a href="{% url 'register' %}" class="text-primary fw-semibold">Register</a>
+              </p>
+          </div>
+      </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+</body>
+</html>

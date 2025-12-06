@@ -1,0 +1,242 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% block main %}
+
+<div class="container mt-3">
+    <div class="card shadow-sm p-2">
+        <!-- Header: Sales Overview + Year Dropdown -->
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="card-title mb-0">
+                Sales Overview — {{ title }} — ₹{{ total_sales }}
+            </h5>
+
+            <!-- Year Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-sm bg-dark text-white border dropdown-toggle fw-medium"
+                        type="button" data-bs-toggle="dropdown" data-bs-display="static">
+                    Year: {{ selected_year }}
+                    <i class="mdi mdi-chevron-down ms-1 fs-14"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    {% for y in years_list %}
+                    <a class="dropdown-item text-dark {% if selected_year == y %}active{% endif %}"
+                       href="?year={{ y }}">
+                        Year {{ y }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Summary Cards -->
+            <div class="row text-center mb-4 g-2">
+                <div class="col-md-3 col-sm-6">
+                    <div class="summary-box p-3 shadow-sm rounded bg-dark text-white">
+                        <h6>💰 Total Sales</h6>
+                        <h5 class="mb-0">₹{{ total_sales }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="summary-box p-3 shadow-sm rounded bg-dark text-white">
+                        <h6>✅ Paid</h6>
+                        <h5 class="mb-0">₹{{ total_paid }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="summary-box p-3 shadow-sm rounded bg-dark text-white">
+                        <h6>❌ Unpaid</h6>
+                        <h5 class="mb-0">₹{{ total_unpaid }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="summary-box p-3 shadow-sm rounded bg-dark text-white">
+                        <h6>⚠️ Overdue</h6>
+                        <h5 class="mb-0">₹{{ total_overdue }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row (Stacked) -->
+            <div class="row g-4">
+                <!-- Monthly Chart -->
+                <div class="col-12 mb-4">
+                    <div class="chart-container p-3 shadow-sm rounded bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6>📆 Monthly Sales</h6>
+                            <div class="dropdown">
+                                <button class="btn btn-sm bg-dark text-white border dropdown-toggle fw-medium"
+                                        type="button" data-bs-toggle="dropdown" data-bs-display="static">
+                                    {{ selected_month_name }}
+                                    <i class="mdi mdi-chevron-down ms-1 fs-14"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    {% for month in months_list %}
+                                    <a class="dropdown-item text-dark {% if selected_month == month.num %}active{% endif %}"
+                                       href="?year={{ selected_year }}&month={{ month.num }}">
+                                        {{ month.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly/Daily Chart -->
+                <div class="col-12 mb-4">
+                    <div class="chart-container p-3 shadow-sm rounded bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6>🗓️ Weekly / Daily Sales</h6>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Chart layout and sizing */
+    .chart-container {
+        height: 100%;
+        overflow: hidden;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Summary box styling */
+    .summary-box {
+        transition: all 0.2s ease-in-out;
+    }
+    .summary-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Dropdown fix */
+    .dropdown-menu {
+        position: absolute !important;
+        z-index: 1050 !important;
+        transform: translate3d(0, 0, 0) !important;
+    }
+
+    /* Prevent dropdown clipping */
+    .card-body, .chart-container {
+        overflow: visible !important;
+    }
+
+    /* Center card and control width */
+    .container {
+        max-width: 1200px;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+</style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    /* ========== MONTHLY LINE CHART ========== */
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyLabels = [{% for m in monthly_sales %}'{{ m.date__month|date:"F" }}',{% endfor %}];
+    const monthlyData = [{% for m in monthly_sales %}{{ m.total }},{% endfor %}];
+
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: monthlyLabels,
+            datasets: [{
+                label: 'Monthly Sales (₹)',
+                data: monthlyData,
+                fill: true,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.15)',
+                borderWidth: 2.5,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#666' } },
+                y: { grid: { color: 'rgba(200,200,200,0.1)' }, ticks: { color: '#666', beginAtZero: true } }
+            }
+        }
+    });
+
+    /* ========== WEEKLY/DAILY BAR CHART ========== */
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    const weeklyLabels = [{% for w in week_sales %}'{{ w.date }}',{% endfor %}];
+    const weeklyData = [{% for w in week_sales %}{{ w.total }},{% endfor %}];
+
+    new Chart(weeklyCtx, {
+        type: 'bar',
+        data: {
+            labels: weeklyLabels,
+            datasets: [
+                {
+                    label: 'Daily Sales (₹)',
+                    type: 'bar',
+                    data: weeklyData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.9)',
+                    borderRadius: 2,
+                    borderSkipped: false,
+                    barThickness: 2,
+                },
+                {
+                    label: 'Sales Dot',
+                    type: 'scatter',
+                    data: weeklyData.map((value, index) => ({ x: weeklyLabels[index], y: value })),
+                    backgroundColor: 'rgba(54, 162, 235, 1)',
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#444', autoSkip: false, font: { size: 10 }, padding: 5 }
+                },
+                y: {
+                    display: true,
+                    beginAtZero: true,
+                    grid: { display: true, color: 'rgba(200,200,200,0.2)', lineWidth: 1, drawBorder: false },
+                    ticks: { color: '#444', stepSize: 10, callback: value => '₹' + value }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

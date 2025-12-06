@@ -141,7 +141,7 @@ def check_username(request):
 
 
 def login_user(request):
-      if request.method == 'POST':
+    if request.method == 'POST':
         identifier = request.POST.get('username')
         password = request.POST.get('password')
 
@@ -155,8 +155,8 @@ def login_user(request):
                 user = None
 
         if user:
-            login(request, user)  # ✅ BACKEND AUTO SELECT HOGA
-            return redirect('home')  # ✅ DASHBOARD
+            login(request, user)
+            return redirect('dashboard')
 
         messages.error(request, "Invalid credentials")
         return redirect('login')

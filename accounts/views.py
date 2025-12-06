@@ -141,32 +141,22 @@ def check_username(request):
 
 
 def login_user(request):
-    if request.method == 'POST':
+      if request.method == 'POST':
         identifier = request.POST.get('username')
         password = request.POST.get('password')
 
-        user = authenticate(
-            request,
-            username=identifier,
-            password=password,
-            backend='accounts.auth_backends.FrontendAuthBackend'
-        )
+        user = authenticate(request, username=identifier, password=password)
 
         if user is None:
             try:
                 u = User.objects.get(email=identifier)
-                user = authenticate(
-                    request,
-                    username=u.username,
-                    password=password,
-                    backend='accounts.auth_backends.FrontendAuthBackend'
-                )
-            except:
-                pass
+                user = authenticate(request, username=u.username, password=password)
+            except User.DoesNotExist:
+                user = None
 
         if user:
-            login(request, user, backend='accounts.auth_backends.FrontendAuthBackend')
-            return redirect('home')
+            login(request, user)  # ✅ BACKEND AUTO SELECT HOGA
+            return redirect('home')  # ✅ DASHBOARD
 
         messages.error(request, "Invalid credentials")
         return redirect('login')
